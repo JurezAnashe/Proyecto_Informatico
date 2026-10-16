@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>PopiTeam — Asociarse</title>
+	<link rel="icon" href="Fotos/popiteam.jpg">
+	<link rel="stylesheet" href="estilos.css">
+	<link rel="stylesheet" href="tarjeta.css">
+</head>
+<body>
+
+<header class="barra barra--simple">
+    <div class="barra__principal">
+        <a href="pagina1.html" class="marca">
+            <img class="marca__imagen" src="Fotos/popiteam.jpg" alt="Escudo PopiTeam">
+            <span class="marca__nombre">PopiTeam<span>Socios</span></span>
+        </a>
+        <div class="barra__acciones">
+            <div class="acciones-usuario">
+                <a class="acciones-usuario__texto" href="login.html">Iniciar sesión o registrarse</a>
+                <a class="icono" href="login.html" aria-label="Perfil">👤</a>
+                <a class="icono carrito" href="carrito.html" aria-label="Carrito">🛒<span>0</span></a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="contenedor-pagina">
+	<section class="tarjeta" aria-label="Formulario de asociarse">
+		<header class="tarjeta__barra">
+			<a class="boton-icono" href="asociarseP1.html" aria-label="Volver">&#8592;</a>
+			<h1>Asociarse — Paso 2 de 2</h1>
+		</header>
+
+		<div class="tarjeta__cuerpo">
+			<div class="introduccion">
+				<h2>Datos de la tarjeta</h2>
+				<p>Ingresá los datos de tu tarjeta de crédito o débito.</p>
+                <p><strong>Valor de la cuota:</strong> $12.000</p>
+			</div>
+
+			<form class="formulario" id="formularioAsociarse">
+				<label class="campo campo--full">
+					<span>Crédito o débito</span>
+					<input type="text" name="tipo_tarjeta" placeholder="Tipo de tarjeta" required>
+				</label>
+
+				<label class="campo campo--full">
+					<span>Nombre en la tarjeta</span>
+					<input type="text" name="nombre_tarjeta" placeholder="Nombre en la tarjeta" required>
+				</label>
+
+				<label class="campo campo--full">
+					<span>Número de la tarjeta</span>
+					<input type="text" name="numero_tarjeta" placeholder="Número de la tarjeta" required>
+				</label>
+
+				<label class="campo campo--full">
+					<span>Código de seguridad</span>
+					<input type="password" name="codigo_seguridad" placeholder="Código de seguridad" required>
+				</label>
+
+				<p class="mensaje-formulario" id="mensajeFormulario" aria-live="polite"></p>
+			</form>
+		</div>
+
+		<footer class="tarjeta__pie">
+			<button type="submit" form="formularioAsociarse" disabled>Confirmar</button>
+		</footer>
+	</section>
+</main>
+
+<script src="sesion.js"></script>
+<script>
+	const form = document.getElementById('formularioAsociarse');
+	const button = document.querySelector('.tarjeta__pie button');
+
+	function updateButtonState() {
+		const isFilled = Array.from(form.elements).every(function (element) {
+			if (!element.name) {
+				return true;
+			}
+			return element.value.trim() !== '';
+		});
+
+		button.disabled = !isFilled || !form.checkValidity();
+		button.classList.toggle('is-active', !button.disabled);
+	}
+
+	form.addEventListener('input', updateButtonState);
+	form.addEventListener('change', updateButtonState);
+	form.addEventListener('submit', function (event) {
+		event.preventDefault();
+		if (button.disabled) {
+			return;
+		}
+		if (!requiereSesion('asociarseP2.html')) {
+			return;
+		}
+		const msg = document.getElementById('mensajeFormulario');
+		msg.textContent = '';
+		button.disabled = true;
+		enviarPHP('php/asociarse.php', {
+			tipo_tarjeta: form.tipo_tarjeta.value,
+			nombre_tarjeta: form.nombre_tarjeta.value,
+			numero_tarjeta: form.numero_tarjeta.value,
+			codigo_seguridad: form.codigo_seguridad.value
+		}).then(function (res) {
+			if (res.datos.ok) {
+				window.location.href = 'socio.html';
+			} else {
+				msg.textContent = res.datos.mensaje || 'No se pudo procesar el pago.';
+				msg.style.color = '#c0392b';
+				updateButtonState();
+			}
+		});
+	});
+
+	updateButtonState();
+</script>
+</body>
+</html>

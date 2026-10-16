@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PopiTeam — Comprar Entradas</title>
+    <link rel="icon" href="Fotos/popiteam.jpg">
+    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="tarjeta.css">
+</head>
+<body>
+<header class="barra barra--simple">
+    <div class="barra__principal">
+        <a href="pagina1.html" class="marca">
+            <img class="marca__imagen" src="Fotos/popiteam.jpg" alt="Escudo PopiTeam">
+            <span class="marca__nombre">PopiTeam<span>Entradas</span></span>
+        </a>
+        <nav class="enlaces-nav">
+            <a href="comprarE.html" class="is-current">COMPRAR ENTRADAS</a>
+            <a href="asistencia.html">ASISTENCIA</a>
+            <a href="socio.html">SOCIO</a>
+        </nav>
+        <div class="barra__acciones">
+            <div class="acciones-usuario">
+                <a class="acciones-usuario__texto" href="login.html">Iniciar sesión o registrarse</a>
+                <a class="icono" href="login.html" aria-label="Perfil">👤</a>
+                <a class="icono carrito" href="carrito.html" aria-label="Carrito">🛒<span>0</span></a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="contenedor-pagina">
+    <section class="tarjeta" aria-label="Formulario de compra">
+        <header class="tarjeta__barra">
+            <a class="boton-icono" href="pagina1.html" aria-label="Volver">&#8592;</a>
+            <h1>Comprar entrada</h1>
+        </header>
+
+        <div class="tarjeta__cuerpo">
+            <div class="introduccion">
+                <h2>Datos de la compra</h2>
+                <p>Ingresá los datos de la tarjeta para completar la compra.</p>
+                <p id="infoPrecio">Elegí el sector y la cantidad de entradas.</p>
+            </div>
+
+            <form class="formulario" id="formularioCompra">
+                <p class="campo campo--full">Partido: <strong>PopiTeam vs River Plate</strong></p>
+
+                <label class="campo campo--full">
+                    <span>Sector</span>
+                    <select name="sector" id="sector" required>
+                        <option value="Popular" data-precio="20000">Popular — $20.000</option>
+                        <option value="Platea" data-precio="80000">Platea — $80.000</option>
+                        <option value="Preferencial" data-precio="120000">Preferencial — $120.000</option>
+                    </select>
+                </label>
+                    </select>
+                </label>
+
+                <label class="campo campo--full">
+                    <span>Cantidad de entradas</span>
+                    <input type="number" name="cantidad" id="cantidad" min="1" max="10" value="1" required>
+                </label>
+
+                <label class="campo campo--full">
+                    <span>Crédito o débito</span>
+                    <input type="text" name="tipo_tarjeta" placeholder="Tipo de tarjeta" required>
+                </label>
+
+                <label class="campo campo--full">
+                    <span>Nombre en la tarjeta</span>
+                    <input type="text" name="nombre_tarjeta" placeholder="Nombre en la tarjeta" required>
+                </label>
+
+                <label class="campo campo--full">
+                    <span>Número de la tarjeta</span>
+                    <input type="text" name="numero_tarjeta" placeholder="Número de la tarjeta" required>
+                </label>
+
+                <label class="campo campo--full">
+                    <span>Código de seguridad</span>
+                    <input type="password" name="codigo_seguridad" placeholder="Código de seguridad" required>
+                </label>
+
+                <p class="mensaje-formulario" id="mensajeFormulario" aria-live="polite"></p>
+                <p class="mensaje-formulario" style="color:var(--brown-900); font-weight:800;">Total: $<span id="total">12000</span></p>
+            </form>
+        </div>
+
+        <footer class="tarjeta__pie">
+            <button type="button" id="botonComprar" disabled>Comprar</button>
+        </footer>
+    </section>
+</main>
+
+<script src="sesion.js"></script>
+<script>
+    const form = document.getElementById('formularioCompra');
+    const botonComprar = document.getElementById('botonComprar');
+    const cantidadInput = document.getElementById('cantidad');
+    const totalSpan = document.getElementById('total');
+    const sectorSelect = document.getElementById('sector');
+    const mensajeFormulario = document.getElementById('mensajeFormulario');
+
+    // Solo para mostrar el total: el valor real lo calcula el servidor (php/config.php)
+    function precioUnitario() {
+        return parseInt(sectorSelect.selectedOptions[0].dataset.precio, 10);
+    }
+
+    function updateTotal() {
+        const qty = parseInt(cantidadInput.value, 10) || 1;
+        totalSpan.textContent = precioUnitario() * Math.max(1, qty);
+    }
+
+    function updateButtonState() {
+        const isFilled = Array.from(form.elements).every(function (element) {
+            if (!element.name || element.type === 'button') {
+                return true;
+            }
+            return element.value.trim() !== '';
+        });
+
+        botonComprar.disabled = !isFilled || !form.checkValidity();
+        botonComprar.classList.toggle('is-active', !botonComprar.disabled);
+    }
+
+    form.addEventListener('input', function (e) {
+        updateButtonState();
+        if (e.target === cantidadInput) updateTotal();
+    });
+    form.addEventListener('change', function () { updateButtonState(); updateTotal(); });
+
+    function submitPurchase() {
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        // Solo se puede comprar si el usuario inició sesión
+        if (!requiereSesion('comprarE.html')) {
+            return;
+        }
+
+        botonComprar.disabled = true;
+        mensajeFormulario.textContent = '';
+
+        enviarPHP('php/comprar_entradas.php', {
+            sector: form.sector.value,
+            cantidad: parseInt(form.cantidad.value, 10) || 1,
+            tipo_tarjeta: form.tipo_tarjeta.value,
+            nombre_tarjeta: form.nombre_tarjeta.value,
+            numero_tarjeta: form.numero_tarjeta.value,
+            codigo_seguridad: form.codigo_seguridad.value
+        }).then(function (res) {
+            if (!res.datos.ok) {
+                mensajeFormulario.textContent = res.datos.mensaje || 'No se pudo completar la compra.';
+                mensajeFormulario.style.color = '#c0392b';
+                updateButtonState();
+                return;
+            }
+            const params = new URLSearchParams();
+            params.set('match', 'popiteam-vs-River Plate');
+            params.set('qty', res.datos.cantidad);
+            params.set('name', encodeURIComponent(res.datos.nombre));
+            params.set('total', res.datos.total);
+            window.location.href = `comprobante.html?${params.toString()}`;
+        });
+    }
+
+    botonComprar.addEventListener('click', submitPurchase);
+
+    updateTotal();
+    updateButtonState();
+</script>
+
+</body>
+</html>

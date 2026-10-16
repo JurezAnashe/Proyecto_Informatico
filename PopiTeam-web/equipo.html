@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PopiTeam — Plantel</title>
+    <link rel="icon" href="Fotos/popiteam.jpg">
+    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="equipo.css">
+</head>
+<body>
+
+<header class="barra">
+    <div class="barra__promo">⚡ 25% de reintegro + 6 cuotas sin interés pagando con <strong>MASTERCARD</strong> y <strong>VISA BBVA</strong> — Hasta el 9/12.</div>
+    <div class="barra__principal">
+        <a href="pagina1.html" class="marca">
+            <img class="marca__imagen" src="Fotos/popiteam.jpg" alt="Escudo PopiTeam">
+            <span class="marca__nombre">PopiTeam<span>Club Atlético</span></span>
+        </a>
+        <nav class="enlaces-nav">
+            <a href="ropa.html">TIENDA</a>
+            <a href="partidos.html">PRÓXIMOS PARTIDOS</a>
+            <a href="asociarseP1.html">ASOCIARSE</a>
+            <a href="historia.html">HISTORIA DEL CLUB</a>
+            <a href="equipo.html" class="is-current">EQUIPO</a>
+        </nav>
+        <div class="barra__acciones">
+            <div class="acciones-usuario">
+                <a class="acciones-usuario__texto" href="login.html">Iniciar sesión o registrarse</a>
+                <a class="icono" href="login.html" aria-label="Perfil">👤</a>
+                <a class="icono carrito" href="carrito.html" aria-label="Carrito">🛒<span>0</span></a>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<main class="contenido-pagina">
+    <section class="plantel-seccion">
+        <h2 class="titulo-seccion">Plantel Oficial</h2>
+        
+        <div class="tabla-contenedor">
+            <table class="tabla-jugadores">
+                <thead>
+                    <tr>
+                        <th>Dorsal</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Edad</th>
+                        <th>Posición</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr onclick="abrirVentana('Lisandro', 'Sadañoski D\'Aversa', 17, 'Arquero', '$2000', '44', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">44</td>
+                        <td>Lisandro</td>
+                        <td>Sadañoski D'Aversa</td>
+                        <td>17</td>
+                        <td>Arquero</td>
+                        <td>$2000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Juan Emiliano', 'Avalos', 19, 'Arquero', '$1000', '23', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">23</td>
+                        <td>Juan Emiliano</td>
+                        <td>Avalos</td>
+                        <td>19</td>
+                        <td>Arquero</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Rodrigo Popigo', 'Coronel Maraza', 18, 'Defensa', '$3000', '13', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">13</td>
+                        <td>Rodrigo Popigo</td>
+                        <td>Coronel Maraza</td>
+                        <td>18</td>
+                        <td>Defensa</td>
+                        <td>$3000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Dylan', 'Alian', 17, 'Defensa', '$2000', '3', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">3</td>
+                        <td>Dylan</td>
+                        <td>Alian</td>
+                        <td>17</td>
+                        <td>Defensa</td>
+                        <td>$2000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Ignacio \'Nacho\'', 'Gutierrez', '17', 'Mediocentro', '$500', '5', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">5</td>
+                        <td>Ignacio "Nacho"</td>
+                        <td>Gutierrez</td>
+                        <td>17</td>
+                        <td>Mediocentro</td>
+                        <td>$500</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Diego Matias Chego', 'Rondal Arauco', 17, 'Mediocentro', '$1500', '20', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">20</td>
+                        <td>Diego Matias Chego</td>
+                        <td>Rondal Arauco</td>
+                        <td>17</td>
+                        <td>Mediocentro</td>
+                        <td>$1500</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Julio Cesar Junior', 'Lavado Janampa', 17, 'Mediocentro', '$2000', '8', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">8</td>
+                        <td>Julio Cesar Junior</td>
+                        <td>Lavado Janampa</td>
+                        <td>17</td>
+                        <td>Mediocentro</td>
+                        <td>$2000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Benjamin Santino', 'Ferrazzuolo Bandin', 17, 'Mediocentro', '$2000', '9', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">9</td>
+                        <td>Benjamin Santino</td>
+                        <td>Ferrazzuolo Bandin</td>
+                        <td>17</td>
+                        <td>Mediocentro</td>
+                        <td>$2000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Ulises', 'Di Venanzio', 17, 'Mediapunta', '$3000', '10', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">10</td>
+                        <td>Ulises</td>
+                        <td>Di Venanzio</td>
+                        <td>17</td>
+                        <td>Mediapunta</td>
+                        <td>$3000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Santiago Alejandro', 'Rodriguez Goyo', 18, 'Extremo', '$2000', '36', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">36</td>
+                        <td>Santiago Alejandro</td>
+                        <td>Rodriguez Goyo</td>
+                        <td>18</td>
+                        <td>Extremo</td>
+                        <td>$2000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Lucas Leonel', 'Cavani Juarez', 18, 'Delantero', '$1000', '21', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">21</td>
+                        <td>Lucas Leonel</td>
+                        <td>Cavani Juarez</td>
+                        <td>18</td>
+                        <td>Delantero</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Ivan Maximiliano', 'Garcia', 18, 'Delantero', '$1000', '19', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">19</td>
+                        <td>Ivan Maximiliano</td>
+                        <td>Garcia</td>
+                        <td>18</td>
+                        <td>Delantero</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Jesus Alexander', 'Oliva Masape', 18, 'Extremo', '$1000', '11', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">11</td>
+                        <td>Jesus Alexander</td>
+                        <td>Oliva Masape</td>
+                        <td>18</td>
+                        <td>Extremo</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Joaquin Tomy', 'Lovera Britez', 18, 'Extremo', '$2000', '7', 'Jugador oficial del plantel.')">
+                        <td class="col-dorsal">7</td>
+                        <td>Joaquin Tomy</td>
+                        <td>Lovera Britez</td>
+                        <td>18</td>
+                        <td>Extremo</td>
+                        <td>$2000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Adriano', 'Ferreira', 17, 'Director Técnico', '$2000', 'DT', 'Director Técnico del plantel.')">
+                        <td class="col-dorsal">DT</td>
+                        <td>Adriano</td>
+                        <td>Ferreira</td>
+                        <td>17</td>
+                        <td>Director Técnico</td>
+                        <td>$2000</td>
+                    </tr>
+                    <tr onclick="abrirVentana('Dylan', 'Lavado Janampa', 8, 'Ayudante de Campo', '$300', 'AC', 'Ayudante de campo del plantel.')">
+                        <td class="col-dorsal">AC</td>
+                        <td>Dylan</td>
+                        <td>Lavado Janampa</td>
+                        <td>8</td>
+                        <td>Ayudante de Campo</td>
+                        <td>$300</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<div id="ventanaJugador" class="ventana">
+    <div class="ventana-contenido">
+        <span class="cerrar-ventana" onclick="cerrarVentana()">&times;</span>
+        
+        <div class="ventana-diseno">
+            
+            <div class="info-jugador">
+                <h2 id="ventana-nombre">Nombre Completo</h2>
+                
+                <ul class="lista-datos">
+                    <li><strong>Edad:</strong> <span id="ventana-edad"> - </span></li>
+                    <li><strong>Posición:</strong> <span id="ventana-posicion"> - </span></li>
+                    <li><strong>Dorsal:</strong> <span id="ventana-dorsal"> - </span></li>
+                    <li><strong>Valor:</strong> <span id="ventana-valor"> - </span></li>
+                    <li><strong>Club Actual:</strong> Popiteam FC</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="jspagina.js"></script>
+<script src="sesion.js"></script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PopiTeam — Carrito de compras</title>
+    <link rel="icon" href="Fotos/popiteam.jpg">
+    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="tarjeta.css">
+    <link rel="stylesheet" href="ropa.css">
+</head>
+<body>
+
+<header class="barra barra--simple">
+    <div class="barra__principal">
+        <a href="pagina1.html" class="marca">
+            <img class="marca__imagen" src="Fotos/popiteam.jpg" alt="Escudo PopiTeam">
+            <span class="marca__nombre">PopiTeam<span>Carrito</span></span>
+        </a>
+        <div class="barra__acciones">
+            <div class="acciones-usuario">
+                <a class="acciones-usuario__texto" href="login.html">Iniciar sesión o registrarse</a>
+                <a class="icono" href="login.html" aria-label="Perfil">👤</a>
+                <a class="icono carrito" href="carrito.html" aria-label="Carrito">🛒<span>0</span></a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="contenedor-pagina" style="align-items:flex-start; padding-top:36px; padding-bottom:36px;">
+    <section class="tarjeta" style="width:min(100%, 720px);" aria-label="Carrito de compras">
+        <header class="tarjeta__barra">
+            <a class="boton-icono" href="ropa.html" aria-label="Volver">&#8592;</a>
+            <h1>Tu carrito</h1>
+        </header>
+
+        <div class="tarjeta__cuerpo" style="max-height:none;">
+            <div id="carritoVacio" hidden>
+                <p style="text-align:center; padding:30px 0; color:var(--ink-500);">Tu carrito está vacío. <a href="ropa.html">Ir a la tienda</a></p>
+            </div>
+
+            <div id="listaCarrito" class="lista-carrito"></div>
+
+            <p class="mensaje-formulario" id="mensajeCarrito" aria-live="polite"></p>
+        </div>
+
+        <footer class="tarjeta__pie" style="justify-content:space-between;">
+            <span style="font-weight:800; color:var(--brown-900);">Total: $<span id="totalCarrito">0</span></span>
+            <button type="button" id="botonFinalizar">Finalizar compra</button>
+        </footer>
+    </section>
+</main>
+
+<style>
+.lista-carrito{ display:grid; gap:16px; }
+.item-carrito{
+    display:grid;
+    grid-template-columns:64px 1fr auto auto;
+    align-items:center;
+    gap:14px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line);
+}
+.item-carrito__imagen{
+    width:64px; height:64px;
+    border-radius:8px;
+    overflow:hidden;
+    background:var(--paper-2);
+}
+.item-carrito__imagen img{ width:100%; height:100%; object-fit:cover; }
+.item-carrito__info h4{ margin:0 0 4px; font-size:.95rem; color:var(--brown-900); }
+.item-carrito__info span{ font-size:.85rem; color:var(--ink-500); }
+.item-carrito__cantidad{
+    width:56px; height:38px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    text-align:center;
+    font-size:.9rem;
+}
+.item-carrito__quitar{
+    border:0; background:none;
+    color:#c0392b;
+    font-weight:700;
+    font-size:.82rem;
+    cursor:pointer;
+    text-decoration:underline;
+}
+</style>
+
+<script src="sesion.js"></script>
+<script>
+    const listaCarrito = document.getElementById('listaCarrito');
+    const carritoVacio = document.getElementById('carritoVacio');
+    const totalCarritoSpan = document.getElementById('totalCarrito');
+    const mensajeCarrito = document.getElementById('mensajeCarrito');
+    const botonFinalizar = document.getElementById('botonFinalizar');
+
+    function renderizarCarrito() {
+        const carrito = obtenerCarrito();
+        listaCarrito.innerHTML = '';
+
+        if (carrito.length === 0) {
+            carritoVacio.hidden = false;
+            botonFinalizar.disabled = true;
+        } else {
+            carritoVacio.hidden = true;
+            botonFinalizar.disabled = false;
+        }
+
+        carrito.forEach(function (producto) {
+            const item = document.createElement('div');
+            item.className = 'item-carrito';
+            item.innerHTML =
+                '<div class="item-carrito__imagen"><img src="' + producto.imagen + '" alt="' + producto.nombre + '"></div>' +
+                '<div class="item-carrito__info"><h4>' + producto.nombre + '</h4><span>$' + producto.precio.toLocaleString('es-AR') + ' c/u</span></div>' +
+                '<input class="item-carrito__cantidad" type="number" min="1" value="' + producto.cantidad + '" data-id="' + producto.id + '">' +
+                '<button type="button" class="item-carrito__quitar" data-id="' + producto.id + '">Quitar</button>';
+            listaCarrito.appendChild(item);
+        });
+
+        listaCarrito.querySelectorAll('.item-carrito__cantidad').forEach(function (input) {
+            input.addEventListener('change', function () {
+                cambiarCantidadCarrito(input.dataset.id, input.value);
+            });
+        });
+
+        listaCarrito.querySelectorAll('.item-carrito__quitar').forEach(function (boton) {
+            boton.addEventListener('click', function () {
+                quitarDelCarrito(boton.dataset.id);
+            });
+        });
+
+        totalCarritoSpan.textContent = calcularTotalCarrito().toLocaleString('es-AR');
+    }
+
+    botonFinalizar.addEventListener('click', function () {
+        if (!requiereSesion('carrito.html')) {
+            return;
+        }
+        const carrito = obtenerCarrito();
+        if (carrito.length === 0) {
+            return;
+        }
+        botonFinalizar.disabled = true;
+        mensajeCarrito.textContent = '';
+        const items = carrito.map(function (p) { return { id: p.id, cantidad: p.cantidad }; });
+
+        enviarPHP('php/comprar_productos.php', { items: items }).then(function (res) {
+            if (!res.datos.ok) {
+                mensajeCarrito.textContent = res.datos.mensaje || 'No se pudo completar la compra.';
+                mensajeCarrito.style.color = '#c0392b';
+                botonFinalizar.disabled = false;
+                return;
+            }
+            vaciarCarrito();
+            const params = new URLSearchParams();
+            params.set('match', 'tienda-popiteam');
+            params.set('qty', res.datos.cantidad);
+            params.set('name', encodeURIComponent(res.datos.nombre));
+            params.set('total', res.datos.total);
+            window.location.href = 'comprobante.html?' + params.toString();
+        });
+    });
+
+    renderizarCarrito();
+</script>
+
+</body>
+</html>
