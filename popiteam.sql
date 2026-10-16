@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 05-10-2026 a las 23:48:21
+-- Tiempo de generación: 16-10-2026 a las 23:39:27
 -- Versión del servidor: 5.6.34
 -- Versión de PHP: 7.1.11
 
@@ -34,14 +34,6 @@ CREATE TABLE `entrada` (
   `sector` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `valor_entrada` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `entrada`
---
-
-INSERT INTO `entrada` (`id_entrada`, `id_usuario`, `sector`, `valor_entrada`) VALUES
-(1, 1, 'Platea', '12000.00'),
-(2, 1, 'Platea', '12000.00');
 
 -- --------------------------------------------------------
 
@@ -83,12 +75,25 @@ CREATE TABLE `socio` (
   `Fecha_asociamiento` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
 --
--- Volcado de datos para la tabla `socio`
+-- Estructura de tabla para la tabla `tarjetas`
 --
 
-INSERT INTO `socio` (`id_socio`, `id_usuario`, `Tipo_socio`, `Estado`, `Fecha_asociamiento`) VALUES
-(1, 1, 'Pleno', 'Activo', '2026-10-05');
+CREATE TABLE `tarjetas` (
+  `id_tarjeta` int(10) UNSIGNED NOT NULL,
+  `numero_tarjeta` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `saldo` decimal(12,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `tarjetas`
+--
+
+INSERT INTO `tarjetas` (`id_tarjeta`, `numero_tarjeta`, `saldo`) VALUES
+(1, '123456789123456', '120000.00'),
+(2, '654321987654321', '50000.00');
 
 -- --------------------------------------------------------
 
@@ -107,13 +112,6 @@ CREATE TABLE `usuarios` (
   `contrasena` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `usuarios`
---
-
-INSERT INTO `usuarios` (`id_usuario`, `Nombre`, `Apellido`, `Email`, `Dni`, `Fecha_nacimiento`, `Telefono`, `contrasena`) VALUES
-(1, 'Lucas Leonel', 'Juarez', 'lucasjuar08@gmail.com', '49008231', '2000-12-12', '1132160602', '$2y$10$CiCXYyVCwnZg9SrKUZjZQ.G8n7larU/hknBTwbffCrStfERbm4jv2');
-
 -- --------------------------------------------------------
 
 --
@@ -127,15 +125,6 @@ CREATE TABLE `venta` (
   `cantidad_productos` int(10) UNSIGNED NOT NULL,
   `precioTotal` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `venta`
---
-
-INSERT INTO `venta` (`id_venta`, `id_producto`, `id_usuario`, `cantidad_productos`, `precioTotal`) VALUES
-(1, 1, 1, 1, '38000.00'),
-(2, 2, 1, 1, '36000.00'),
-(3, 3, 1, 1, '32000.00');
 
 --
 -- Índices para tablas volcadas
@@ -162,6 +151,13 @@ ALTER TABLE `socio`
   ADD UNIQUE KEY `uq_socio_usuario` (`id_usuario`);
 
 --
+-- Indices de la tabla `tarjetas`
+--
+ALTER TABLE `tarjetas`
+  ADD PRIMARY KEY (`id_tarjeta`),
+  ADD UNIQUE KEY `numero_tarjeta` (`numero_tarjeta`);
+
+--
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -185,7 +181,7 @@ ALTER TABLE `venta`
 -- AUTO_INCREMENT de la tabla `entrada`
 --
 ALTER TABLE `entrada`
-  MODIFY `id_entrada` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_entrada` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `producto`
@@ -197,19 +193,25 @@ ALTER TABLE `producto`
 -- AUTO_INCREMENT de la tabla `socio`
 --
 ALTER TABLE `socio`
-  MODIFY `id_socio` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_socio` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tarjetas`
+--
+ALTER TABLE `tarjetas`
+  MODIFY `id_tarjeta` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_usuario` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `venta`
 --
 ALTER TABLE `venta`
-  MODIFY `id_venta` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_venta` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
