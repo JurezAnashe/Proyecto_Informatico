@@ -1,0 +1,143 @@
+.plantel-portada{
+    background:linear-gradient(150deg, var(--brown-950), var(--brown-800));
+    color:#fff;
+    padding:72px 0 56px;
+    text-align:center;
+}
+.plantel-portada p{ max-width:52ch; margin:14px auto 0; color:#e6dac0; line-height:1.7; }
+
+.plantel-seccion{
+    background-color:var(--black);
+    padding:64px 0 84px;
+}
+
+.grilla-jugadores{
+    display:flex;
+    flex-wrap:wrap;
+    gap:22px;
+    justify-content:center;
+}
+
+.tarjeta-jugador{
+    background-color:var(--black-soft);
+    border:2px solid var(--gold-500);
+    border-radius:var(--radius-m);
+    width:220px;
+    padding:28px 20px;
+    text-align:center;
+    cursor:pointer;
+    color:#fff;
+    transition:transform .2s ease, background-color .2s ease, color .2s ease;
+}
+
+.tarjeta-jugador:hover{
+    transform:translateY(-6px);
+    background-color:var(--gold-400);
+    color:var(--brown-950);
+}
+
+.tarjeta-jugador h3{
+    margin:0 0 10px 0;
+    font-size:1.1rem;
+    font-weight:800;
+    letter-spacing:.03em;
+}
+
+.tarjeta-jugador .dorsal{
+    margin:0;
+    font-family:var(--font-display);
+    font-size:2rem;
+}
+
+/* Modal */
+.ventana{
+    display:none;
+    position:fixed;
+    z-index:2000;
+    inset:0;
+    background-color:rgba(10,8,6,.86);
+}
+
+.ventana-contenido{
+    background-color:var(--black-soft);
+    border:3px solid var(--gold-500);
+    border-radius:var(--radius-l);
+    margin:6% auto;
+    padding:36px;
+    width:90%;
+    max-width:760px;
+    position:relative;
+    color:#fff;
+    box-shadow:var(--shadow-2);
+}
+
+.cerrar-ventana{
+    color:var(--gold-400);
+    position:absolute;
+    top:12px;
+    right:20px;
+    font-size:38px;
+    font-weight:bold;
+    cursor:pointer;
+    line-height:1;
+    transition:color .2s;
+}
+.cerrar-ventana:hover{ color:#fff; }
+
+.ventana-diseno{
+    display:flex;
+    gap:34px;
+    align-items:flex-start;
+}
+
+.foto-placeholder{
+    width:230px;
+    height:280px;
+    background-color:#1a1712;
+    border:2px dashed var(--gold-500);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:#7e7364;
+    border-radius:12px;
+    flex-shrink:0;
+    font-weight:700;
+}
+
+.info-jugador{ flex-grow:1; }
+
+.info-jugador h2{
+    margin-top:0;
+    font-family:var(--font-display);
+    font-weight:400;
+    color:var(--gold-400);
+    font-size:1.9rem;
+    border-bottom:2px solid #262019;
+    padding-bottom:12px;
+    text-transform:uppercase;
+}
+
+.descripcion-breve{
+    font-style:italic;
+    color:#b9ac91;
+    line-height:1.5;
+    margin-bottom:22px;
+}
+
+.lista-datos{ list-style:none; padding:0; margin:0; }
+
+.lista-datos li{
+    margin-bottom:12px;
+    font-size:1rem;
+    border-bottom:1px solid #201b14;
+    padding-bottom:6px;
+}
+
+.lista-datos strong{ color:var(--gold-400); margin-right:6px; }
+
+@media (max-width:760px){
+    .ventana-diseno{ flex-direction:column; align-items:center; }
+    .foto-placeholder{ width:100%; max-width:230px; }
+    .ventana-contenido{ margin:14% auto; padding:22px; }
+}
