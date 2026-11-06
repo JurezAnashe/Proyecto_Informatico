@@ -7,12 +7,23 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Manrope:wght@400;600;800&display=swap">
     <link rel="stylesheet" href="Estilos.css">
 </head>
-<body>
+<body data-page="login">
     <div class="wrap">
         <h1 class="logo">Popicasino</h1>
         <p class="tag">El casino más prestigioso del pais</p>
         
-        <section class="panel">
+        <section class="panel hidden" id="pl">
+            <form id="flogin">
+                <h2>Iniciar sesión</h2>
+                <div class="f full"><label for="lm">Email</label><input id="lm" type="email" autocomplete="email" required></div>
+                <div class="f full"><label for="lp">Contraseña</label><input id="lp" type="password" autocomplete="current-password" required></div>
+                <div id="lest" class="estado mal full hidden"></div>
+                <button class="btn full" type="submit">Entrar</button>
+                <p class="login-sw">¿No tenés cuenta? <button type="button" class="link" data-sw="r">Registrate</button></p>
+            </form>
+        </section>
+        
+        <section class="panel" id="pr">
             <form id="form">
                 <h2>Registrarse</h2>
                 
@@ -66,12 +77,14 @@
                 <div id="estado" class="estado full hidden"></div>
                 
                 <button class="btn full" type="submit">Verificar y entrar</button>
+                <p class="login-sw">¿Ya tenés cuenta? <button type="button" class="link" data-sw="l">Iniciá sesión</button></p>
             </form>
         </section>
         
         <footer>Juego de entretenimiento, si el juego deja de ser un juego, pedí ayuda.</footer>
     </div>
 
+    <script src="app.js"></script>
     <script>
         const $ = id => document.getElementById(id);
         const form = $('form');
@@ -126,8 +139,29 @@
                 return;
             }
 
+            const creada = Popi.registrar({nombre: $('nom').value.trim(), apellido: $('ape').value.trim(), dni: $('dni').value, nac: $('nac').value, mail: $('mail').value.trim(), pass: $('pass').value});
+            if (!creada) {
+                estado.textContent = 'Ese email ya tiene una cuenta. Iniciá sesión.';
+                estado.className = 'estado mal full';
+                return;
+            }
             estado.textContent = 'Registrado correctamente, ¡bienvenido al mejor casino del pais!';
             estado.className = 'estado bien full';
+            setTimeout(() => location.href = 'inicio.html', 900);
+        });
+
+        // Alternar registro / inicio de sesión
+        document.querySelectorAll('[data-sw]').forEach(b => b.onclick = () => {
+            const l = b.dataset.sw === 'l';
+            $('pl').classList.toggle('hidden', !l);
+            $('pr').classList.toggle('hidden', l);
+        });
+        $('flogin').addEventListener('submit', e => {
+            e.preventDefault();
+            const m = $('lest');
+            if (Popi.entrar($('lm').value.trim(), $('lp').value)) { location.href = 'inicio.html'; return; }
+            m.textContent = 'Email o contraseña incorrectos.';
+            m.classList.remove('hidden');
         });
     </script>
 </body>

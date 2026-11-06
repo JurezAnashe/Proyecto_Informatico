@@ -97,3 +97,124 @@ footer{margin-top:34px;text-align:center;font-size:12px;color:var(--mut);line-he
 
 @media(max-width:560px){form{grid-template-columns:1fr}.panel{padding:20px}}
 @media(prefers-reduced-motion:reduce){.logo{animation:none}}
+
+/* ===== Base compartida ===== */
+.hidden{display:none!important}
+.err{font-size:12px;color:#ff6b75;min-height:0}
+.estado{padding:12px 14px;border-radius:3px;font-size:14px;border:1px solid var(--line)}
+.estado.mal{color:#ff8a92;border-color:var(--red)}
+.estado.bien{color:var(--gold)}
+a{color:var(--gold)}
+.link{background:none;border:0;color:var(--gold);cursor:pointer;font:inherit;text-decoration:underline;padding:0}
+.btn.ghost{background:transparent;color:var(--gold);border:1px solid var(--gold2)}
+.btn.sm{padding:9px 14px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.login-sw{text-align:center;margin-top:18px;font-size:14px;color:var(--mut);grid-column:1/-1}
+
+/* ===== Layout de la app ===== */
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh;position:relative}
+.side{position:sticky;top:0;height:100vh;border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:4px;background:#050408}
+.brand{font:400 26px 'Italiana',Georgia,serif;letter-spacing:.14em;color:var(--ink);text-shadow:0 0 18px rgba(230,195,106,.5);padding:0 10px 20px;text-decoration:none}
+.side a.nav{padding:11px 12px;border-radius:3px;color:var(--mut);text-decoration:none;font-weight:600;font-size:14px;border-left:2px solid transparent}
+.side a.nav:hover{color:var(--ink)}
+.side a.nav[aria-current=page]{color:var(--gold);border-left-color:var(--gold);background:rgba(230,195,106,.07)}
+.side .sp{flex:1}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 24px;background:rgba(0,0,0,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .brand{display:none;padding:0;margin-right:auto;font-size:20px}
+.saldo{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15}
+.saldo small{font-size:11px;color:var(--mut)}
+.saldo b{color:var(--gold);font-size:17px}
+.who{color:var(--mut);font-size:13px}
+.main{padding:28px 24px 80px;max-width:1100px;width:100%}
+.main>header{margin-bottom:22px}
+.main h1{font-size:clamp(34px,5vw,52px);letter-spacing:.04em}
+.main h2{font-size:26px;margin:34px 0 14px}
+.sub{color:var(--mut);margin:6px 0 0;max-width:60ch}
+
+/* ===== Filtros y tarjetas ===== */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+.chip{background:#000;border:1px solid var(--line);color:var(--mut);padding:8px 14px;border-radius:20px;cursor:pointer;font:600 13px 'Manrope',sans-serif}
+.chip[aria-pressed=true]{color:#000;background:var(--gold);border-color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:16px}
+.game{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:10px;border:1px solid var(--line);border-radius:4px;background:var(--card)}
+.game:hover{border-color:var(--gold)}
+.game:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.cover{position:relative;aspect-ratio:4/5;border-radius:3px;display:grid;place-items:center;margin-bottom:6px;background:linear-gradient(150deg,hsl(var(--h,40) 55% 24%),#07060a 80%);border:1px solid rgba(230,195,106,.12)}
+.cover b{font:400 64px 'Italiana',Georgia,serif;color:var(--gold);text-shadow:0 0 24px rgba(230,195,106,.45)}
+.cover i{position:absolute;top:8px;left:8px;font:600 10px 'Manrope',sans-serif;font-style:normal;background:rgba(0,0,0,.7);color:var(--mut);padding:3px 7px;border-radius:2px}
+.gname{font-weight:800;font-size:14px}
+.gmeta{font-size:12px;color:var(--mut)}
+
+/* ===== Inicio ===== */
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.cat{display:block;text-decoration:none;color:var(--ink);padding:22px;border:1px solid var(--line);border-radius:4px;background:linear-gradient(160deg,rgba(230,195,106,.09),var(--card) 70%)}
+.cat:hover{border-color:var(--gold)}
+.cat h3{font:400 28px 'Italiana',Georgia,serif;margin:0 0 6px;color:var(--gold)}
+.cat p{margin:0;color:var(--mut);font-size:14px}
+.rowh{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px}
+.rowh .game{flex:0 0 168px}
+
+/* ===== Deportes ===== */
+.dep{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start}
+.ev{display:grid;grid-template-columns:1fr auto;gap:10px 16px;padding:14px;border:1px solid var(--line);border-radius:4px;background:var(--card);margin-bottom:12px}
+.ev small{color:var(--mut);font-size:12px}
+.ev strong{display:block;font-size:15px;margin-top:2px}
+.odds{display:flex;gap:8px;grid-column:1/-1}
+.odd{flex:1;background:#000;border:1px solid var(--line);color:var(--ink);border-radius:3px;padding:9px 6px;cursor:pointer;font:600 13px 'Manrope',sans-serif;display:flex;flex-direction:column;gap:2px}
+.odd span{color:var(--mut);font-size:11px}
+.odd b{color:var(--gold);font-size:15px}
+.odd[aria-pressed=true]{background:var(--gold);border-color:var(--gold)}
+.odd[aria-pressed=true] span,.odd[aria-pressed=true] b{color:#000}
+.boleto{position:sticky;top:76px;padding:18px}
+.boleto h3{font:400 24px 'Italiana',Georgia,serif;margin:0 0 12px}
+.pick{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:8px 0;border-bottom:1px solid var(--line)}
+.pick b{color:var(--gold)}
+.vacio{color:var(--mut);font-size:13px;margin:0 0 12px}
+.row{display:flex;justify-content:space-between;font-size:14px;margin:10px 0}
+.boleto input[type=number],.mbody input[type=number]{width:100%;background:#000;border:1px solid var(--line);border-radius:3px;color:var(--ink);padding:11px;font:inherit}
+
+/* ===== Social ===== */
+.feed{max-width:640px;display:grid;gap:14px}
+.post{padding:16px;border:1px solid var(--line);border-radius:4px;background:var(--card)}
+.post header{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;font-weight:800}
+.post header small{color:var(--mut);display:block;font-size:12px}
+.slip{border:1px dashed var(--gold2);border-radius:3px;padding:10px 12px;font-size:14px;display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}
+.slip b{color:var(--gold)}
+.acts{display:flex;gap:8px}
+
+/* ===== Cuenta ===== */
+.bal{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center}
+.bal b{display:block;font:400 clamp(38px,7vw,60px) 'Italiana',Georgia,serif;color:var(--gold);text-shadow:0 0 30px rgba(230,195,106,.35)}
+.bal small{color:var(--mut)}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.mov{list-style:none;margin:0;padding:0}
+.mov li{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
+.mov small{color:var(--mut);display:block;font-size:12px}
+.pos{color:var(--gold)}.neg{color:#ff8a92}
+
+/* ===== Modal y toast ===== */
+.modal{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.78)}
+.mbox{width:min(520px,100%);max-height:90vh;overflow:auto;border:1px solid var(--gold2);border-radius:4px;background:linear-gradient(180deg,#0d0b10,var(--card))}
+.mbox .cover{aspect-ratio:16/7;margin:0;border-radius:0}
+.mbody{padding:20px}
+.mbody h2{font-size:30px;margin:0 0 6px}
+.mbody p{color:var(--mut);margin:0 0 14px}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.info div{border:1px solid var(--line);border-radius:3px;padding:10px;font-size:13px}
+.info small{display:block;color:var(--mut)}
+.mact{display:flex;gap:10px;justify-content:flex-end}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:30;background:var(--gold);color:#000;font-weight:800;font-size:14px;padding:11px 18px;border-radius:3px}
+.foot{margin-top:50px}
+
+/* ===== Mobile ===== */
+@media(max-width:820px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;z-index:10;flex-direction:row;overflow-x:auto;padding:6px;gap:2px;border-right:0;border-top:1px solid var(--line)}
+  .side .brand,.side .sp{display:none}
+  .side a.nav{white-space:nowrap;border-left:0;border-top:2px solid transparent;padding:10px 12px}
+  .side a.nav[aria-current=page]{border-top-color:var(--gold)}
+  .top{padding:10px 16px}.top .brand{display:block}.who{display:none}
+  .main{padding:20px 16px 90px}
+  .dep{grid-template-columns:1fr}.boleto{position:static}
+}
