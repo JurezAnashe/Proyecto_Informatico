@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Popicasino</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Manrope:wght@400;600;800&display=swap">
+    <link rel="stylesheet" href="Estilos.css">
+</head>
+<body>
+    <div class="wrap">
+        <h1 class="logo">Popicasino</h1>
+        <p class="tag">El casino más prestigioso del pais</p>
+        
+        <section class="panel">
+            <form id="form">
+                <h2>Registrarse</h2>
+                
+                <div class="f">
+                    <label for="nom">Nombre</label>
+                    <input id="nom" type="text" autocomplete="given-name" required minlength="2">
+                    <span class="err"></span> 
+                </div>
+                
+                <div class="f">
+                    <label for="ape">Apellido</label>
+                    <input id="ape" type="text" autocomplete="family-name" required minlength="2">
+                    <span class="err"></span> 
+                </div>
+                
+                <div class="f">
+                    <label for="dni">DNI</label>
+                    <input id="dni" type="text" inputmode="numeric" maxlength="8" pattern="\d{7,8}" required>
+                    <span class="err"></span> 
+                </div>
+                
+                <div class="f">
+                    <label for="nac">Fecha de nacimiento</label>
+                    <input id="nac" type="date" required>
+                    <span class="err"></span> 
+                </div>
+                
+                <div class="f full">
+                    <label for="mail">Email</label>
+                    <input id="mail" type="email" autocomplete="email" required>
+                    <span class="err"></span> 
+                </div>
+                
+                <div class="f full">
+                    <label for="pass">Contraseña (mínimo 6 caracteres)</label>
+                    <input id="pass" type="password" autocomplete="new-password" minlength="6" required>
+                    <span class="err"></span> 
+                </div>
+                
+                <label class="chk">
+                    <input id="ok" type="checkbox" required>
+                    <span>Declaro que los datos son verdaderos y que soy mayor de 18 años. Entiendo que el juego usa fichas reales.</span>
+                </label>
+
+                <label class="chk">
+                    <input id="news" type="checkbox">
+                    <span>Acepto los Términos y Condiciones y la Política de Privacidad</span>
+                </label>
+                <span id="okerr" class="err"></span> 
+                
+                <div id="estado" class="estado full hidden"></div>
+                
+                <button class="btn full" type="submit">Verificar y entrar</button>
+            </form>
+        </section>
+        
+        <footer>Juego de entretenimiento, si el juego deja de ser un juego, pedí ayuda.</footer>
+    </div>
+
+    <script>
+        const $ = id => document.getElementById(id);
+        const form = $('form');
+        const estado = $('estado');
+        
+        $('nac').max = new Date().toISOString().split('T')[0];
+
+        function calcularEdad(fecha) {
+            const nac = new Date(fecha + 'T00:00:00');
+            const hoy = new Date();
+            let edad = hoy.getFullYear() - nac.getFullYear();
+            const mes = hoy.getMonth() - nac.getMonth();
+            if (mes < 0 || (mes === 0 && hoy.getDate() < nac.getDate())) edad--;
+            return edad;
+        }
+
+        function error(id, texto) {
+            const contenedorError = $(id).parentNode.querySelector('.err');
+            if (contenedorError) contenedorError.textContent = texto;
+            return !texto;
+        }
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            estado.className = 'estado full hidden';
+            estado.textContent = '';
+            
+            let ok = true;
+
+            ok = error('nom', $('nom').value.trim().length < 2 ? 'Ingresá tu nombre' : '') && ok;
+            ok = error('ape', $('ape').value.trim().length < 2 ? 'Ingresá tu apellido' : '') && ok;
+            ok = error('dni', !/^\d{7,8}$/.test($('dni').value) ? 'El DNI tiene 7 u 8 números' : '') && ok;
+            ok = error('mail', !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('mail').value) ? 'Email inválido' : '') && ok;
+            ok = error('pass', $('pass').value.length < 6 ? 'Mínimo 6 caracteres' : '') && ok;
+
+            let edad = NaN;
+            if (!$('nac').value) {
+                ok = error('nac', 'Ingresá tu fecha de nacimiento') && ok;
+            } else {
+                edad = calcularEdad($('nac').value);
+                ok = error('nac', edad < 0 || edad > 110 ? 'Fecha inválida' : '') && ok;
+            }
+
+            $('okerr').textContent = $('ok').checked ? '' : 'Tenés que aceptar para continuar';
+            if (!$('ok').checked) ok = false;
+
+            if (!ok) return;
+
+            if (edad < 18) {
+                estado.textContent = 'Error, tenes que ser mayor de 18 años para registrarte';
+                estado.className = 'estado mal full';
+                return;
+            }
+
+            estado.textContent = 'Registrado correctamente, ¡bienvenido al mejor casino del pais!';
+            estado.className = 'estado bien full';
+        });
+    </script>
+</body>
+</html>
