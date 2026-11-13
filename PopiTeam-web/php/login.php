@@ -6,7 +6,7 @@ $email = mb_strtolower(texto($d, 'email', 100));
 $clave = is_string($d['contrasena'] ?? null) ? $d['contrasena'] : '';
 
 try {
-    $st = db()->prepare('SELECT id_usuario, Nombre, Email, contrasena FROM Usuarios WHERE Email = ?');
+    $st = db()->prepare('SELECT id_usuario, Nombre, Email, contrasena, rol FROM Usuarios WHERE Email = ?');
     $st->execute([$email]);
     $u = $st->fetch();
 } catch (PDOException $e) {
@@ -19,4 +19,11 @@ if (!$u || !password_verify($clave, $u['contrasena'])) {
 
 session_regenerate_id(true);
 $_SESSION['id_usuario'] = (int) $u['id_usuario'];
-responder(['ok' => true, 'nombre' => $u['Nombre'], 'correo' => $u['Email']]);
+$_SESSION['rol'] = $u['rol'];
+responder([
+    'ok'        => true,
+    'nombre'    => $u['Nombre'],
+    'correo'    => $u['Email'],
+    'rol'       => $u['rol'],
+    'redirigir' => $u['rol'] === 'admin' ? 'admin_productos.html' : 'index.html',
+]);

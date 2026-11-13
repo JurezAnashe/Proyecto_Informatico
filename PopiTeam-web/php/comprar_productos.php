@@ -32,7 +32,7 @@ try {
     $pdo = db();
     $pdo->beginTransaction();
 
-    $sel = $pdo->prepare('SELECT nombre_producto, precio, stock FROM Producto WHERE id_producto = ? FOR UPDATE');
+    $sel = $pdo->prepare('SELECT nombre_producto, precio, stock FROM Producto WHERE id_producto = ? AND activo = 1 FOR UPDATE');
     $upd = $pdo->prepare('UPDATE Producto SET stock = stock - ? WHERE id_producto = ?');
     $ins = $pdo->prepare(
         'INSERT INTO Venta (id_producto, id_usuario, cantidad_productos, precioTotal) VALUES (?, ?, ?, ?)'
@@ -56,17 +56,17 @@ try {
         $unidades += $cant;
     }
 
-    $stmtTarjeta = $pdo->prepare('SELECT id_tarjeta, saldo FROM tarjetas WHERE numero_tarjeta = ? FOR UPDATE');
-    $stmtTarjeta->execute([$numeroTarjeta]);
+    // La tarjeta y el saldo pertenecen al usuario logueado
+    $stmtTarjeta = $pdo->prepare('SELECT numero_tarjeta, saldo FROM Usuarios WHERE id_usuario = ? FOR UPDATE');
+    $stmtTarjeta->execute([$idUsuario]);
     $tarjeta = $stmtTarjeta->fetch();
 
-    if (!$tarjeta) {
+    if (!$tarjeta || $tarjeta['numero_tarjeta'] === null || $tarjeta['numero_tarjeta'] !== $numeroTarjeta) {
         $pdo->rollBack();
-        error_json('La tarjeta ingresada no existe en el sistema.');
+        error_json('La tarjeta ingresada no coincide con la de tu cuenta.');
     }
 
     $saldo_actual = (float) $tarjeta['saldo'];
-    $idTarjeta = $tarjeta['id_tarjeta'];
 
     if ($saldo_actual < $total) {
         $pdo->rollBack();
@@ -74,11 +74,12 @@ try {
     }
 
     $nuevo_saldo = $saldo_actual - $total;
-    $updSaldo = $pdo->prepare('UPDATE tarjetas SET saldo = ? WHERE id_tarjeta = ?');
-    $updSaldo->execute([$nuevo_saldo, $idTarjeta]);
+    $updSaldo = $pdo->prepare('UPDATE Usuarios SET saldo = ? WHERE id_usuario = ?');
+    $updSaldo->execute([$nuevo_saldo, $idUsuario]);
 
     foreach ($pedido as $id => $cant) {
-        $subtotal = round((float) $pdo->query("SELECT precio FROM Producto WHERE id_producto = $id")->fetchColumn() * $cant, 2);
+        $sel->execute([$id]);
+        $subtotal = round((float) $sel->fetch()['precio'] * $cant, 2);
         $upd->execute([$cant, $id]);
         $ins->execute([$id, $idUsuario, $cant, $subtotal]);
     }

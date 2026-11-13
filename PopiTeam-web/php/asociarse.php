@@ -1,38 +1,23 @@
 <?php
+// LISTAR (ABM) - solo admin. Devuelve productos activos (o todos con ?todos=1).
 require __DIR__ . '/config.php';
 
-$idUsuario = requerir_sesion();
-$d = leer_json();
-validar_tarjeta($d); 
+requerir_admin();
+
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    error_json('Método no permitido.', 405);
+}
+
+$sql = 'SELECT id_producto, nombre_producto, precio, stock, activo FROM Producto';
+if (($_GET['todos'] ?? '0') !== '1') {
+    $sql .= ' WHERE activo = 1';
+}
+$sql .= ' ORDER BY id_producto';
 
 try {
-    $pdo = db();
-    $pdo->beginTransaction();
-
-    $st = $pdo->prepare('SELECT 1 FROM Usuarios WHERE id_usuario = ? FOR UPDATE');
-    $st->execute([$idUsuario]);
-    if (!$st->fetch()) {
-        $pdo->rollBack();
-        error_json('Usuario no encontrado.', 401);
-    }
-
-    $st = $pdo->prepare('SELECT 1 FROM Socio WHERE id_usuario = ?');
-    $st->execute([$idUsuario]);
-    if ($st->fetch()) {
-        $pdo->rollBack();
-        error_json('Ya sos socio de PopiTeam.', 409);
-    }
-
-    $st = $pdo->prepare(
-        'INSERT INTO Socio (id_usuario, Tipo_socio, Estado, Fecha_asociamiento)
-         VALUES (?, ?, \'Activo\', CURDATE())'
-    );
-    $st->execute([$idUsuario, TIPO_SOCIO]);
-    $pdo->commit();
+    $filas = db()->query($sql)->fetchAll();
 } catch (PDOException $e) {
-    if (isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
-    if ($e->getCode() === '23000') error_json('Ya sos socio de PopiTeam.', 409);
     error_servidor($e);
 }
 
-responder(['ok' => true, 'total' => CUOTA_SOCIO]);
+responder(['ok' => true, 'productos' => $filas]);
