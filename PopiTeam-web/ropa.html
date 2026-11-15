@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="estilos.css">
     <link rel="stylesheet" href="home.css">
     <link rel="stylesheet" href="ropa.css">
+<style>
+.stock-producto{ display:block; margin-top:6px; font-size:.85rem; color:var(--ink-500); }
+.stock-producto--poco{ color:#b9770e; font-weight:700; }
+.stock-producto--agotado{ color:#c0392b; font-weight:700; }
+.tarjeta-producto__boton:disabled{ opacity:.5; cursor:not-allowed; }
+</style>
 </head>
 <body>
 
@@ -46,77 +52,8 @@
 
     <section class="seccion">
         <div class="container">
-            <div class="productos">
-
-                <div class="tarjeta-producto">
-                    <div class="tarjeta-producto__imagen">
-                        <span class="tarjeta-producto__etiqueta">Nueva</span>
-                        <img src="Fotos/remeratitular.jpg">
-                    </div>
-                    <div class="tarjeta-producto__cuerpo">
-                        <h3>Camiseta Titular 2026</h3>
-                        <span class="precio">$38.000</span><span class="precio-ant">$50.000</span>
-                    </div>
-                    <button type="button" class="tarjeta-producto__boton" onclick="agregarAlCarrito({id:1, nombre:'Camiseta Titular 2026', precio:38000, imagen:'Fotos/remeratitular.jpg'})">Agregar al carrito</button>
-                </div>
-
-                <div class="tarjeta-producto">
-                    <div class="tarjeta-producto__imagen">
-                        <img src="Fotos/remeraalternativa.jpg">
-                    </div>
-                    <div class="tarjeta-producto__cuerpo">
-                        <h3>Camiseta Alternativa</h3>
-                        <span class="precio">$36.000</span>
-                    </div>
-                    <button type="button" class="tarjeta-producto__boton" onclick="agregarAlCarrito({id:2, nombre:'Camiseta Alternativa', precio:36000, imagen:'Fotos/remeraalternativa.jpg'})">Agregar al carrito</button>
-                </div>
-
-                <div class="tarjeta-producto">
-                    <div class="tarjeta-producto__imagen">
-                        <span class="tarjeta-producto__etiqueta">-20%</span>
-                        <img src="Fotos/campera.jpg">
-                    </div>
-                    <div class="tarjeta-producto__cuerpo">
-                        <h3>Campera de Entrenamiento</h3>
-                        <span class="precio">$32.000</span><span class="precio-ant">$40.000</span>
-                    </div>
-                    <button type="button" class="tarjeta-producto__boton" onclick="agregarAlCarrito({id:3, nombre:'Campera de Entrenamiento', precio:32000, imagen:'Fotos/campera.jpg'})">Agregar al carrito</button>
-                </div>
-
-                <div class="tarjeta-producto">
-                    <div class="tarjeta-producto__imagen">
-                        <img src="Fotos/bufanda.jpg">
-                    </div>
-                    <div class="tarjeta-producto__cuerpo">
-                        <h3>Bufanda Oficial</h3>
-                        <span class="precio">$14.000</span>
-                    </div>
-                    <button type="button" class="tarjeta-producto__boton" onclick="agregarAlCarrito({id:4, nombre:'Bufanda Oficial', precio:14000, imagen:'Fotos/bufanda.jpg'})">Agregar al carrito</button>
-                </div>
-
-                <div class="tarjeta-producto">
-                    <div class="tarjeta-producto__imagen">
-                        <img src="Fotos/gorra.jpg">
-                    </div>
-                    <div class="tarjeta-producto__cuerpo">
-                        <h3>Gorra Oficial</h3>
-                        <span class="precio">$18.000</span>
-                    </div>
-                    <button type="button" class="tarjeta-producto__boton" onclick="agregarAlCarrito({id:5, nombre:'Gorra Oficial', precio:18000, imagen:'Fotos/gorra.jpg'})">Agregar al carrito</button>
-                </div>
-
-                <div class="tarjeta-producto">
-                    <div class="tarjeta-producto__imagen">
-                        <span class="tarjeta-producto__etiqueta">Socios -15%</span>
-                        <img src="Fotos/pelota.jpg">
-                    </div>
-                    <div class="tarjeta-producto__cuerpo">
-                        <h3>Pelota Oficial N°5</h3>
-                        <span class="precio">$22.000</span>
-                    </div>
-                    <button type="button" class="tarjeta-producto__boton" onclick="agregarAlCarrito({id:6, nombre:'Pelota Oficial N°5', precio:22000, imagen:'Fotos/pelota.jpg'})">Agregar al carrito</button>
-                </div>
-
+            <div class="productos" id="listaProductos">
+                <p id="mensajeProductos" style="grid-column:1/-1; text-align:center; color:var(--ink-500);">Cargando productos…</p>
             </div>
         </div>
     </section>
@@ -170,5 +107,83 @@
 
 <script src="sesion.js"></script>
 <script src="admin.js"></script>
+<script>
+    // La tienda muestra los productos que hay en la base de datos (php/productos_tienda.php)
+    (function () {
+        const lista = document.getElementById('listaProductos');
+        const mensaje = document.getElementById('mensajeProductos');
+
+        function crear(tag, clase, texto) {
+            const e = document.createElement(tag);
+            if (clase) e.className = clase;
+            if (texto !== undefined) e.textContent = texto;
+            return e;
+        }
+
+        function tarjeta(p) {
+            const stock = parseInt(p.stock, 10);
+            const t = crear('div', 'tarjeta-producto');
+            t.dataset.id = p.id_producto;
+
+            const imagen = crear('div', 'tarjeta-producto__imagen');
+            if (p.imagen) {
+                const img = document.createElement('img');
+                img.src = p.imagen;
+                img.alt = p.nombre_producto;
+                imagen.appendChild(img);
+            }
+            t.appendChild(imagen);
+
+            const cuerpo = crear('div', 'tarjeta-producto__cuerpo');
+            cuerpo.appendChild(crear('h3', '', p.nombre_producto));
+            cuerpo.appendChild(crear('span', 'precio', '$' + Number(p.precio).toLocaleString('es-AR')));
+
+            const etiquetaStock = crear('span', 'stock-producto');
+            if (stock === 0) {
+                etiquetaStock.textContent = 'Sin stock';
+                etiquetaStock.classList.add('stock-producto--agotado');
+            } else if (stock <= 5) {
+                etiquetaStock.textContent = stock === 1 ? '¡Última unidad!' : '¡Quedan solo ' + stock + ' unidades!';
+                etiquetaStock.classList.add('stock-producto--poco');
+            } else {
+                etiquetaStock.textContent = 'Stock: ' + stock + ' unidades';
+            }
+            cuerpo.appendChild(etiquetaStock);
+            t.appendChild(cuerpo);
+
+            const boton = crear('button', 'tarjeta-producto__boton', 'Agregar al carrito');
+            boton.type = 'button';
+            boton.disabled = stock === 0;
+            boton.addEventListener('click', function () {
+                agregarAlCarrito({ id: Number(p.id_producto), nombre: p.nombre_producto, precio: Number(p.precio), imagen: p.imagen || '' });
+            });
+            t.appendChild(boton);
+            return t;
+        }
+
+        let estado = 0;
+        fetch('php/productos_tienda.php', { credentials: 'same-origin' })
+            .then(function (r) { estado = r.status; return r.json().catch(function () { return {}; }); })
+            .then(function (d) {
+                if (!d.ok) throw new Error(d.mensaje || '');
+                lista.innerHTML = '';
+                if (d.productos.length === 0) {
+                    lista.appendChild(crear('p', '', 'Por ahora no hay productos disponibles.'));
+                    return;
+                }
+                d.productos.forEach(function (p) { lista.appendChild(tarjeta(p)); });
+            })
+            .catch(function (e) {
+                let causa = e && e.message;
+                if (!causa) {
+                    causa = estado === 404
+                        ? 'No se encontró php/productos_tienda.php (revisá que esté en la carpeta php).'
+                        : 'El servidor devolvió una respuesta inválida (código ' + estado + ').';
+                }
+                mensaje.textContent = 'No se pudieron cargar los productos. ' + causa;
+                mensaje.style.color = '#c0392b';
+            });
+    })();
+</script>
 </body>
 </html>

@@ -4,7 +4,7 @@ declare(strict_types=1);
 const DB_HOST = 'localhost';
 const DB_NAME = 'popiteam';
 const DB_USER = 'root';
-const DB_PASS = '';
+const DB_PASS = 'usbw';
 
 const CUOTA_SOCIO  = 12000;
 const TIPO_SOCIO   = 'Pleno';
@@ -96,16 +96,29 @@ function requerir_admin(): int
     return $id;
 }
 
+function requerir_cliente(string $accion = 'comprar entradas'): int
+{
+    $id = requerir_sesion();
+    $st = db()->prepare('SELECT rol FROM Usuarios WHERE id_usuario = ?');
+    $st->execute([$id]);
+    if ($st->fetchColumn() === 'admin') {
+        error_json('El administrador no puede ' . $accion . '. Usá una cuenta de cliente.', 403);
+    }
+    return $id;
+}
+
 function validar_producto(array $d): array
 {
     $nombre = texto($d, 'nombre_producto', 100);
     $precio = filter_var($d['precio'] ?? null, FILTER_VALIDATE_FLOAT);
     $stock  = filter_var($d['stock'] ?? null, FILTER_VALIDATE_INT);
+    $categoria = texto($d, 'categoria', 50);
 
     if ($nombre === '')                         error_json('Ingresá el nombre del producto.');
     if ($precio === false || $precio <= 0)      error_json('El precio debe ser mayor a 0.');
     if ($stock === false || $stock < 0)         error_json('El stock no puede ser negativo.');
-    return [$nombre, round((float) $precio, 2), $stock];
+    if ($categoria === '')                      error_json('Ingresá la categoría del producto.');
+    return [$nombre, round((float) $precio, 2), $stock, $categoria];
 }
 
 function validar_tarjeta(array $d): void
@@ -134,3 +147,5 @@ function error_servidor(Throwable $e): void
     error_log('PopiTeam: ' . $e->getMessage());
     error_json('Ocurrio un error en el servidor. Proba de nuevo en un momento.', 500);
 }
+
+set_exception_handler('error_servidor');

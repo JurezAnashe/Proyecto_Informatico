@@ -103,6 +103,20 @@
     const totalSpan = document.getElementById('total');
     const sectorSelect = document.getElementById('sector');
     const mensajeFormulario = document.getElementById('mensajeFormulario');
+    let esAdmin = false;
+
+    // El administrador no compra entradas: solo se bloquea para esa cuenta
+    fetch('php/rol.php', { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+            if (d && d.rol === 'admin') {
+                esAdmin = true;
+                mensajeFormulario.textContent = 'El administrador no puede comprar entradas. Iniciá sesión con una cuenta de cliente.';
+                mensajeFormulario.style.color = '#c0392b';
+                updateButtonState();
+            }
+        })
+        .catch(function () {});
 
     // Solo para mostrar el total: el valor real lo calcula el servidor (php/config.php)
     function precioUnitario() {
@@ -122,7 +136,7 @@
             return element.value.trim() !== '';
         });
 
-        botonComprar.disabled = !isFilled || !form.checkValidity();
+        botonComprar.disabled = esAdmin || !isFilled || !form.checkValidity();
         botonComprar.classList.toggle('is-active', !botonComprar.disabled);
     }
 

@@ -76,6 +76,26 @@
 <script>
 	const form = document.getElementById('formularioAsociarse');
 	const button = document.querySelector('.tarjeta__pie button');
+	let esAdmin = false;
+
+	// El administrador no se asocia: solo se bloquea para esa cuenta
+	fetch('php/rol.php', { credentials: 'same-origin' })
+		.then(function (r) { return r.json(); })
+		.then(function (d) {
+			if (d && d.es_socio) {
+				// Ya es socio: no se le vuelve a pedir el pago
+				window.location.replace('socio.html');
+				return;
+			}
+			if (d && d.rol === 'admin') {
+				esAdmin = true;
+				const aviso = document.getElementById('mensajeFormulario');
+				aviso.textContent = 'El administrador no puede asociarse. Iniciá sesión con una cuenta de cliente.';
+				aviso.style.color = '#c0392b';
+				updateButtonState();
+			}
+		})
+		.catch(function () {});
 
 	function updateButtonState() {
 		const isFilled = Array.from(form.elements).every(function (element) {
@@ -85,7 +105,7 @@
 			return element.value.trim() !== '';
 		});
 
-		button.disabled = !isFilled || !form.checkValidity();
+		button.disabled = esAdmin || !isFilled || !form.checkValidity();
 		button.classList.toggle('is-active', !button.disabled);
 	}
 

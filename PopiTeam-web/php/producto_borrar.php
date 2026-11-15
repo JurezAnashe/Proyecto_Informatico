@@ -1,5 +1,4 @@
 <?php
-// BORRAR (ABM) - baja lógica (activo = 0). Se conserva el historial de Venta.
 require __DIR__ . '/config.php';
 
 requerir_admin();

@@ -47,20 +47,21 @@ CREATE TABLE `producto` (
   `precio` decimal(10,2) NOT NULL,
   `categoria` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `stock` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `activo` tinyint(1) NOT NULL DEFAULT '1'
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `imagen` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `producto`
 --
 
-INSERT INTO `producto` (`id_producto`, `nombre_producto`, `precio`, `categoria`, `stock`, `activo`) VALUES
-(1, 'Camiseta Titular 2026', '38000.00', 'Camisetas', 49, 1),
-(2, 'Camiseta Alternativa', '36000.00', 'Camisetas', 49, 1),
-(3, 'Campera de Entrenamiento', '32000.00', 'Camperas', 49, 1),
-(4, 'Bufanda Oficial', '14000.00', 'Accesorios', 50, 1),
-(5, 'Gorra Oficial', '18000.00', 'Accesorios', 50, 1),
-(6, 'Pelota Oficial N°5', '22000.00', 'Pelotas', 50, 1);
+INSERT INTO `producto` (`id_producto`, `nombre_producto`, `precio`, `categoria`, `stock`, `activo`, `imagen`) VALUES
+(1, 'Camiseta Titular 2026', '38000.00', 'Camisetas', 49, 1, 'Fotos/remeratitular.jpg'),
+(2, 'Camiseta Alternativa', '36000.00', 'Camisetas', 49, 1, 'Fotos/remeraalternativa.jpg'),
+(3, 'Campera de Entrenamiento', '32000.00', 'Camperas', 49, 1, 'Fotos/campera.jpg'),
+(4, 'Bufanda Oficial', '14000.00', 'Accesorios', 50, 1, 'Fotos/bufanda.jpg'),
+(5, 'Gorra Oficial', '18000.00', 'Accesorios', 50, 1, 'Fotos/gorra.jpg'),
+(6, 'Pelota Oficial N°5', '22000.00', 'Pelotas', 50, 1, 'Fotos/pelota.jpg');
 
 -- --------------------------------------------------------
 
@@ -75,8 +76,6 @@ CREATE TABLE `socio` (
   `Estado` enum('Activo','Inactivo','Suspendido') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Activo',
   `Fecha_asociamiento` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
 
 -- --------------------------------------------------------
 

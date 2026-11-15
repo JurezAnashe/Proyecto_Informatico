@@ -34,16 +34,14 @@
         <div class="tarjeta__cuerpo" style="max-height:none;">
 
             <div class="introduccion">
-                <h2 id="tituloFormulario">Nuevo producto</h2>
-                <p>Solo el administrador puede crear, editar o dar de baja productos.</p>
+                <h2>Nuevo producto</h2>
+                <p>Cargá los datos y elegí una imagen (JPG, PNG o WEBP, hasta 2 MB).</p>
             </div>
 
-            <form class="formulario" id="formularioProducto" novalidate>
-                <input type="hidden" name="id_producto" id="idProducto" value="">
-
+            <form class="formulario" id="formularioNuevo" novalidate>
                 <label class="campo campo--full">
                     <span>Nombre del producto</span>
-                    <input type="text" name="nombre_producto" maxlength="100" placeholder="Ej: Camiseta Titular 2026" required>
+                    <input type="text" name="nombre_producto" maxlength="100" placeholder="Ej: Short Oficial" required>
                 </label>
 
                 <label class="campo campo--full">
@@ -57,27 +55,61 @@
                 </label>
 
                 <label class="campo campo--full">
-                    <span>Stock</span>
+                    <span>Stock inicial</span>
                     <input type="number" name="stock" min="0" step="1" placeholder="Unidades disponibles" required>
                 </label>
 
-                <p class="mensaje-formulario" id="mensajeFormulario" aria-live="polite"></p>
+                <label class="campo campo--full">
+                    <span>Imagen</span>
+                    <input type="file" name="imagen" accept="image/jpeg,image/png,image/webp" required>
+                </label>
 
-                <div class="campo campo--full" style="display:flex; gap:10px;">
-                    <button type="submit" id="botonGuardar" class="is-active">Crear producto</button>
-                    <button type="button" id="botonCancelar" hidden>Cancelar edición</button>
+                <img id="vistaPrevia" alt="Vista previa de la imagen" hidden>
+
+                <p class="mensaje-formulario" id="mensajeNuevo" aria-live="polite"></p>
+
+                <div class="campo campo--full">
+                    <button type="submit" id="botonCrear" class="boton-dorado">Crear producto</button>
                 </div>
             </form>
 
             <hr style="border:0; border-top:1px solid var(--line); margin:26px 0;">
 
+            <form class="formulario" id="formularioProducto" novalidate hidden>
+                <h3 id="tituloFormulario" class="campo campo--full" style="margin:0;"></h3>
+                <input type="hidden" id="idProducto" value="">
+
+                <label class="campo campo--full">
+                    <span>Nombre del producto</span>
+                    <input type="text" name="nombre_producto" maxlength="100" required>
+                </label>
+
+                <label class="campo campo--full">
+                    <span>Precio ($)</span>
+                    <input type="number" name="precio" min="0.01" step="0.01" required>
+                </label>
+
+                <label class="campo campo--full">
+                    <span>Stock</span>
+                    <input type="number" name="stock" min="0" step="1" required>
+                </label>
+
+                <p class="mensaje-formulario" id="mensajeFormulario" aria-live="polite"></p>
+
+                <div class="campo campo--full" style="display:flex; gap:10px;">
+                    <button type="submit" id="botonGuardar" class="boton-dorado">Guardar cambios</button>
+                    <button type="button" id="botonCancelar">Cancelar</button>
+                </div>
+            </form>
+
             <div class="introduccion">
-                <h2>Productos activos</h2>
+                <h2>Productos</h2>
             </div>
 
             <table class="tabla-asistencia">
                 <thead>
                     <tr>
+                        <th>Imagen</th>
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Categoría</th>
@@ -94,18 +126,35 @@
 </main>
 
 <style>
+[hidden]{ display:none !important; }
+.boton-dorado{
+    border:0; border-radius:999px; padding:12px 22px;
+    background:var(--gold-400); color:var(--brown-900);
+    font-weight:800; cursor:pointer;
+}
+.boton-dorado:disabled{ opacity:.5; cursor:not-allowed; }
+#botonCancelar{ background:none; border:1px solid var(--line); border-radius:8px; padding:0 16px; cursor:pointer; }
+#vistaPrevia{ max-width:160px; max-height:160px; border-radius:8px; border:1px solid var(--line); object-fit:cover; }
+.miniatura{ width:48px; height:48px; border-radius:6px; object-fit:cover; background:var(--paper-2); }
 .acciones-fila{ display:flex; gap:12px; }
 .acciones-fila button{
     border:0; background:none; cursor:pointer;
     font-weight:700; font-size:.85rem; text-decoration:underline;
+    color:var(--brown-900);
 }
-.acciones-fila .editar{ color:var(--brown-900); }
 .acciones-fila .borrar{ color:#c0392b; }
-#botonCancelar{ background:none; border:1px solid var(--line); border-radius:8px; padding:0 16px; cursor:pointer; }
 </style>
 
 <script>
     const RUTA_PHP = 'php/';
+    const TIPOS_IMAGEN = ['image/jpeg', 'image/png', 'image/webp'];
+    const MAX_IMAGEN = 2 * 1024 * 1024;
+
+    const formNuevo = document.getElementById('formularioNuevo');
+    const mensajeNuevo = document.getElementById('mensajeNuevo');
+    const botonCrear = document.getElementById('botonCrear');
+    const vistaPrevia = document.getElementById('vistaPrevia');
+
     const form = document.getElementById('formularioProducto');
     const mensajeFormulario = document.getElementById('mensajeFormulario');
     const mensajeLista = document.getElementById('mensajeLista');
@@ -147,12 +196,17 @@
         elemento.style.color = esError ? '#c0392b' : 'var(--gold-600)';
     }
 
-    // ---------- LISTAR ----------
     function cargarProductos() {
         pedir('productos_listar.php').then(function (res) {
             if (sinPermiso(res)) return;
             if (!res.datos.ok) {
-                mostrar(mensajeLista, res.datos.mensaje || 'No se pudo cargar la lista.', true);
+                let texto = res.datos.mensaje;
+                if (!texto) {
+                    texto = res.estado === 404
+                        ? 'No se encontró php/productos_listar.php: revisá que el archivo esté en la carpeta php.'
+                        : 'El servidor devolvió una respuesta inválida (código ' + res.estado + '). Abrí php/productos_listar.php en el navegador para ver el error.';
+                }
+                mostrar(mensajeLista, texto, true);
                 return;
             }
             productos = res.datos.productos;
@@ -166,18 +220,40 @@
         return td;
     }
 
+    function boton(texto, clase, accion) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = texto;
+        if (clase) b.className = clase;
+        b.addEventListener('click', accion);
+        return b;
+    }
+
     function dibujarTabla() {
         cuerpoTabla.innerHTML = '';
         if (productos.length === 0) {
             const tr = document.createElement('tr');
-            const td = celda('No hay productos activos.');
-            td.colSpan = 6;
+            const td = celda('No hay productos.');
+            td.colSpan = 7;
             tr.appendChild(td);
             cuerpoTabla.appendChild(tr);
             return;
         }
         productos.forEach(function (p) {
             const tr = document.createElement('tr');
+
+            const tdImagen = document.createElement('td');
+            if (p.imagen) {
+                const img = document.createElement('img');
+                img.className = 'miniatura';
+                img.src = p.imagen;
+                img.alt = p.nombre_producto;
+                tdImagen.appendChild(img);
+            } else {
+                tdImagen.textContent = '—';
+            }
+            tr.appendChild(tdImagen);
+
             tr.appendChild(celda(p.id_producto));
             tr.appendChild(celda(p.nombre_producto));
             tr.appendChild(celda(p.categoria));
@@ -187,102 +263,129 @@
             const acciones = document.createElement('td');
             const caja = document.createElement('div');
             caja.className = 'acciones-fila';
-
-            const editar = document.createElement('button');
-            editar.type = 'button';
-            editar.className = 'editar';
-            editar.textContent = 'Editar';
-            editar.addEventListener('click', function () { empezarEdicion(p); });
-
-            const borrar = document.createElement('button');
-            borrar.type = 'button';
-            borrar.className = 'borrar';
-            borrar.textContent = 'Borrar';
-            borrar.addEventListener('click', function () { borrarProducto(p); });
-
-            caja.appendChild(editar);
-            caja.appendChild(borrar);
+            caja.appendChild(boton('Editar', '', function () { empezarEdicion(p); }));
+            caja.appendChild(boton('Borrar', 'borrar', function () { borrarProducto(p); }));
             acciones.appendChild(caja);
             tr.appendChild(acciones);
+
             cuerpoTabla.appendChild(tr);
         });
     }
 
-    // ---------- CREAR / EDITAR ----------
-    function validarCliente() {
-        const nombre = form.nombre_producto.value.trim();
-        const categoria = form.categoria.value.trim();
-        const precio = parseFloat(form.precio.value);
-        const stock = Number(form.stock.value);
+    formNuevo.imagen.addEventListener('change', function () {
+        const archivo = formNuevo.imagen.files[0];
+        if (!archivo) { vistaPrevia.hidden = true; return; }
+        vistaPrevia.src = URL.createObjectURL(archivo);
+        vistaPrevia.hidden = false;
+    });
 
-        if (nombre === '') return 'Ingresá el nombre del producto.';
-        if (categoria === '') return 'Ingresá la categoría.';
+    function validarNuevo() {
+        const precio = parseFloat(formNuevo.precio.value);
+        const stock = Number(formNuevo.stock.value);
+        const archivo = formNuevo.imagen.files[0];
+
+        if (formNuevo.nombre_producto.value.trim() === '') return 'Ingresá el nombre del producto.';
+        if (formNuevo.categoria.value.trim() === '') return 'Ingresá la categoría.';
         if (!(precio > 0)) return 'El precio debe ser mayor a 0.';
-        if (form.stock.value === '' || !Number.isInteger(stock) || stock < 0) return 'El stock debe ser un número entero de 0 o más.';
+        if (formNuevo.stock.value === '' || !Number.isInteger(stock) || stock < 0) return 'El stock debe ser un número entero de 0 o más.';
+        if (!archivo) return 'Elegí una imagen para el producto.';
+        if (TIPOS_IMAGEN.indexOf(archivo.type) === -1) return 'La imagen debe ser JPG, PNG o WEBP.';
+        if (archivo.size > MAX_IMAGEN) return 'La imagen es demasiado grande (máximo 2 MB).';
         return '';
     }
 
-    function limpiarFormulario() {
+    formNuevo.addEventListener('submit', function (evento) {
+        evento.preventDefault();
+        mensajeNuevo.textContent = '';
+
+        const error = validarNuevo();
+        if (error) {
+            mostrar(mensajeNuevo, error, true);
+            return;
+        }
+
+        const datos = new FormData();
+        datos.append('nombre_producto', formNuevo.nombre_producto.value.trim());
+        datos.append('categoria', formNuevo.categoria.value.trim());
+        datos.append('precio', formNuevo.precio.value);
+        datos.append('stock', formNuevo.stock.value);
+        datos.append('imagen', formNuevo.imagen.files[0]);
+
+        botonCrear.disabled = true;
+        pedir('producto_crear.php', { method: 'POST', body: datos }).then(function (res) {
+            botonCrear.disabled = false;
+            if (sinPermiso(res)) return;
+            if (!res.datos.ok) {
+                mostrar(mensajeNuevo, res.datos.mensaje || 'No se pudo crear el producto.', true);
+                return;
+            }
+            formNuevo.reset();
+            vistaPrevia.hidden = true;
+            mostrar(mensajeNuevo, 'Producto creado.', false);
+            cargarProductos();
+        });
+    });
+
+    function cerrarFormulario() {
         form.reset();
+        form.hidden = true;
         document.getElementById('idProducto').value = '';
-        tituloFormulario.textContent = 'Nuevo producto';
-        botonGuardar.textContent = 'Crear producto';
-        botonCancelar.hidden = true;
+        mensajeFormulario.textContent = '';
     }
 
     function empezarEdicion(p) {
         document.getElementById('idProducto').value = p.id_producto;
         form.nombre_producto.value = p.nombre_producto;
-        form.categoria.value = p.categoria;
         form.precio.value = p.precio;
         form.stock.value = p.stock;
         tituloFormulario.textContent = 'Editar producto #' + p.id_producto;
-        botonGuardar.textContent = 'Guardar cambios';
-        botonCancelar.hidden = false;
         mensajeFormulario.textContent = '';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        mensajeLista.textContent = '';
+        form.hidden = false;
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    botonCancelar.addEventListener('click', function () {
-        limpiarFormulario();
-        mensajeFormulario.textContent = '';
-    });
+    function validarEdicion() {
+        const precio = parseFloat(form.precio.value);
+        const stock = Number(form.stock.value);
+
+        if (form.nombre_producto.value.trim() === '') return 'Ingresá el nombre del producto.';
+        if (!(precio > 0)) return 'El precio debe ser mayor a 0.';
+        if (form.stock.value === '' || !Number.isInteger(stock) || stock < 0) return 'El stock debe ser un número entero de 0 o más.';
+        return '';
+    }
+
+    botonCancelar.addEventListener('click', cerrarFormulario);
 
     form.addEventListener('submit', function (evento) {
         evento.preventDefault();
         mensajeFormulario.textContent = '';
 
-        const error = validarCliente();
+        const error = validarEdicion();
         if (error) {
             mostrar(mensajeFormulario, error, true);
             return;
         }
 
-        const datos = {
+        botonGuardar.disabled = true;
+        enviar('producto_editar.php', {
+            id_producto: parseInt(document.getElementById('idProducto').value, 10),
             nombre_producto: form.nombre_producto.value.trim(),
-            categoria: form.categoria.value.trim(),
             precio: parseFloat(form.precio.value),
             stock: parseInt(form.stock.value, 10)
-        };
-        const id = document.getElementById('idProducto').value;
-        const editando = id !== '';
-        if (editando) datos.id_producto = parseInt(id, 10);
-
-        botonGuardar.disabled = true;
-        enviar(editando ? 'producto_editar.php' : 'producto_crear.php', datos).then(function (res) {
+        }).then(function (res) {
             botonGuardar.disabled = false;
             if (sinPermiso(res)) return;
             if (!res.datos.ok) {
                 mostrar(mensajeFormulario, res.datos.mensaje || 'No se pudo guardar.', true);
                 return;
             }
-            mostrar(mensajeFormulario, editando ? 'Producto actualizado.' : 'Producto creado.', false);
-            limpiarFormulario();
+            cerrarFormulario();
+            mostrar(mensajeLista, 'Producto actualizado.', false);
             cargarProductos();
         });
     });
 
-    // ---------- BORRAR (baja lógica) ----------
     function borrarProducto(p) {
         if (!confirm('¿Dar de baja "' + p.nombre_producto + '"? Dejará de mostrarse en la tienda.')) {
             return;
@@ -298,7 +401,6 @@
         });
     }
 
-    // ---------- Cerrar sesión ----------
     document.getElementById('botonSalir').addEventListener('click', function (evento) {
         evento.preventDefault();
         pedir('logout.php', { method: 'POST' }).then(function () {

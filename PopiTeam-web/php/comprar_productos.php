@@ -1,16 +1,8 @@
 <?php
 require __DIR__ . '/config.php';
 
-$idUsuario = requerir_sesion();
+$idUsuario = requerir_cliente('comprar productos');
 $d = leer_json();
-
-$numeroTarjeta = '';
-if (isset($d['numero_tarjeta'])) {
-    validar_tarjeta($d);
-    $numeroTarjeta = preg_replace('/[\s-]/', '', texto($d, 'numero_tarjeta', 30));
-} else {
-    error_json('Faltan los datos de la tarjeta de crédito.');
-}
 
 $items = $d['items'] ?? null;
 if (!is_array($items) || count($items) === 0) {
@@ -19,14 +11,14 @@ if (!is_array($items) || count($items) === 0) {
 
 $pedido = [];
 foreach ($items as $it) {
-    $id  = filter_var($it['id'] ?? null, FILTER_VALIDATE_INT);
+    $id   = filter_var($it['id'] ?? null, FILTER_VALIDATE_INT);
     $cant = filter_var($it['cantidad'] ?? null, FILTER_VALIDATE_INT);
     if ($id === false || $cant === false || $id < 1 || $cant < 1 || $cant > 50) {
         error_json('Hay un producto inválido en el carrito.');
     }
     $pedido[$id] = ($pedido[$id] ?? 0) + $cant;
 }
-ksort($pedido);  
+ksort($pedido);
 
 try {
     $pdo = db();
@@ -40,6 +32,7 @@ try {
 
     $total = 0.0;
     $unidades = 0;
+    $subtotales = [];
     foreach ($pedido as $id => $cant) {
         $sel->execute([$id]);
         $p = $sel->fetch();
@@ -51,19 +44,18 @@ try {
             $pdo->rollBack();
             error_json('No hay stock suficiente de "' . $p['nombre_producto'] . '" (quedan ' . (int) $p['stock'] . ').', 409);
         }
-        $subtotal = round((float) $p['precio'] * $cant, 2);
-        $total += $subtotal;
+        $subtotales[$id] = round((float) $p['precio'] * $cant, 2);
+        $total += $subtotales[$id];
         $unidades += $cant;
     }
 
-    // La tarjeta y el saldo pertenecen al usuario logueado
     $stmtTarjeta = $pdo->prepare('SELECT numero_tarjeta, saldo FROM Usuarios WHERE id_usuario = ? FOR UPDATE');
     $stmtTarjeta->execute([$idUsuario]);
     $tarjeta = $stmtTarjeta->fetch();
 
-    if (!$tarjeta || $tarjeta['numero_tarjeta'] === null || $tarjeta['numero_tarjeta'] !== $numeroTarjeta) {
+    if (!$tarjeta || $tarjeta['numero_tarjeta'] === null || $tarjeta['numero_tarjeta'] === '') {
         $pdo->rollBack();
-        error_json('La tarjeta ingresada no coincide con la de tu cuenta.');
+        error_json('Tu cuenta no tiene una tarjeta asociada.');
     }
 
     $saldo_actual = (float) $tarjeta['saldo'];
@@ -78,10 +70,8 @@ try {
     $updSaldo->execute([$nuevo_saldo, $idUsuario]);
 
     foreach ($pedido as $id => $cant) {
-        $sel->execute([$id]);
-        $subtotal = round((float) $sel->fetch()['precio'] * $cant, 2);
         $upd->execute([$cant, $id]);
-        $ins->execute([$id, $idUsuario, $cant, $subtotal]);
+        $ins->execute([$id, $idUsuario, $cant, $subtotales[$id]]);
     }
 
     $nom = $pdo->prepare('SELECT Nombre FROM Usuarios WHERE id_usuario = ?');

@@ -93,6 +93,17 @@
 <script src="sesion.js"></script>
 <script src="admin.js"></script>
 <script>
+	// Con sesión iniciada no se piden los datos de nuevo: se usa la cuenta actual
+	fetch('php/rol.php', { credentials: 'same-origin' })
+		.then(function (r) { return r.json(); })
+		.then(function (d) {
+			if (!d || !d.logueado) return;                         // sin sesión: se muestra el registro
+			if (d.es_socio) { window.location.replace('socio.html'); return; }   // ya es socio
+			if (d.rol !== 'admin') window.location.replace('asociarseP2.html');  // cliente: directo al pago
+		})
+		.catch(function () {});
+</script>
+<script>
 	const form = document.querySelector('.formulario');
 	const button = document.querySelector('.tarjeta__pie button');
 	const password = form.elements.contrasena;

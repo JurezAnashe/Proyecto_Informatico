@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/config.php';
 
-$idUsuario = requerir_sesion();
+$idUsuario = requerir_cliente();
 $d = leer_json();
 
 $sector   = texto($d, 'sector', 30);
