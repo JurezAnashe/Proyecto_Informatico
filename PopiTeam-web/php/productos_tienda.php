@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 try {
     $filas = db()->query(
-        'SELECT id_producto, nombre_producto, precio, categoria, stock, imagen
+        'SELECT id_producto, nombre_producto, precio, categoria, (stock > 0) AS disponible, imagen
          FROM Producto
          WHERE activo = 1
          ORDER BY id_producto'

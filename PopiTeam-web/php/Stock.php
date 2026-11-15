@@ -6,14 +6,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-    $filas = db()->query('SELECT id_producto, stock FROM Producto WHERE activo = 1')->fetchAll();
+    $filas = db()->query('SELECT id_producto, (stock > 0) AS disponible FROM Producto WHERE activo = 1')->fetchAll();
 } catch (PDOException $e) {
     error_servidor($e);
 }
 
 $stock = [];
 foreach ($filas as $f) {
-    $stock[(int) $f['id_producto']] = (int) $f['stock'];
+    $stock[(int) $f['id_producto']] = (bool) $f['disponible'];
 }
 
-responder(['ok' => true, 'stock' => $stock]);
+responder(['ok' => true, 'disponible' => $stock]);

@@ -42,7 +42,7 @@ try {
         }
         if ((int) $p['stock'] < $cant) {
             $pdo->rollBack();
-            error_json('No hay stock suficiente de "' . $p['nombre_producto'] . '" (quedan ' . (int) $p['stock'] . ').', 409);
+            error_json('"' . $p['nombre_producto'] . '" ' . ((int) $p['stock'] === 0 ? 'está sin stock.' : 'no tiene stock suficiente para la cantidad pedida.'), 409);
         }
         $subtotales[$id] = round((float) $p['precio'] * $cant, 2);
         $total += $subtotales[$id];

@@ -13,6 +13,7 @@
 .stock-producto--poco{ color:#b9770e; font-weight:700; }
 .stock-producto--agotado{ color:#c0392b; font-weight:700; }
 .tarjeta-producto__boton:disabled{ opacity:.5; cursor:not-allowed; }
+.tarjeta-producto--agotado .tarjeta-producto__imagen{ filter:grayscale(1); opacity:.6; }
 </style>
 </head>
 <body>
@@ -121,9 +122,10 @@
         }
 
         function tarjeta(p) {
-            const stock = parseInt(p.stock, 10);
+            const agotado = Number(p.disponible) === 0;
             const t = crear('div', 'tarjeta-producto');
             t.dataset.id = p.id_producto;
+            if (agotado) t.classList.add('tarjeta-producto--agotado');
 
             const imagen = crear('div', 'tarjeta-producto__imagen');
             if (p.imagen) {
@@ -138,22 +140,14 @@
             cuerpo.appendChild(crear('h3', '', p.nombre_producto));
             cuerpo.appendChild(crear('span', 'precio', '$' + Number(p.precio).toLocaleString('es-AR')));
 
-            const etiquetaStock = crear('span', 'stock-producto');
-            if (stock === 0) {
-                etiquetaStock.textContent = 'Sin stock';
-                etiquetaStock.classList.add('stock-producto--agotado');
-            } else if (stock <= 5) {
-                etiquetaStock.textContent = stock === 1 ? '¡Última unidad!' : '¡Quedan solo ' + stock + ' unidades!';
-                etiquetaStock.classList.add('stock-producto--poco');
-            } else {
-                etiquetaStock.textContent = 'Stock: ' + stock + ' unidades';
+            if (agotado) {
+                cuerpo.appendChild(crear('span', 'stock-producto stock-producto--agotado', 'Sin stock'));
             }
-            cuerpo.appendChild(etiquetaStock);
             t.appendChild(cuerpo);
 
-            const boton = crear('button', 'tarjeta-producto__boton', 'Agregar al carrito');
+            const boton = crear('button', 'tarjeta-producto__boton', agotado ? 'Sin stock' : 'Agregar al carrito');
             boton.type = 'button';
-            boton.disabled = stock === 0;
+            boton.disabled = agotado;
             boton.addEventListener('click', function () {
                 agregarAlCarrito({ id: Number(p.id_producto), nombre: p.nombre_producto, precio: Number(p.precio), imagen: p.imagen || '' });
             });
