@@ -15,7 +15,6 @@ if ($cantidad === false || $cantidad < 1 || $cantidad > MAX_ENTRADAS_POR_COMPRA)
 }
 validar_tarjeta($d);  
 
-// Tomar el número de tarjeta ingresado en el formulario web
 $numeroTarjeta = preg_replace('/[\s-]/', '', texto($d, 'numero_tarjeta', 30));
 
 $valor = SECTORES[$sector];
