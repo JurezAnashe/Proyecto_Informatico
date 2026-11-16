@@ -1,7 +1,5 @@
 <?php
-// Registro inicial de usuario admin.
-// Si todavía no existe ningún admin, cualquiera puede crear el primero.
-// Una vez que existe uno, solo un admin logueado puede crear otros.
+// Registro inicial de usuario admin, si todavía no existe ningún admin, cualquiera puede crear el primero. Una vez que existe uno, solo un admin logueado puede crear otros.
 require __DIR__ . '/config.php';
 
 $d = leer_json();
