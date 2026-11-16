@@ -1,5 +1,4 @@
-// Agrega al sitio normal lo que solo puede ver el administrador.
-// Se incluye en todas las páginas; para clientes y visitantes no hace nada.
+
 (function () {
     fetch('php/rol.php', { credentials: 'same-origin' })
         .then(function (r) { return r.json(); })
